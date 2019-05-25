@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import Cell from './Cell';
+import HiddenCell from './Cell_Hidden';
+import RevealedCell from './Cell_Revealed';
 
 class Board extends Component {
 
@@ -72,7 +73,7 @@ class Board extends Component {
     while (mines < this.props.mineCount) {
 
       let [x, y] = mineGenerator();
-      
+
       valueMap[x][y] = 'mine';
 
       for (let i = x - 1; i <= x + 1; i++) {
@@ -133,14 +134,16 @@ class Board extends Component {
         <table>
           <tbody>
             {board.map((r, x) => <tr key={x}>
-              {r.map((c, y) => <Cell
-                key={`${x},${y}`}
-                show={boardView[x][y]}
-                value={c}
-                x={x}
-                y={y}
-                handleChange={this.changeCellView}
-                gameOver={gameEndMessage.length} />)}
+              {r.map((c, y) => (
+                boardView[x][y] ?
+                  <RevealedCell value={c} /> :
+                  <HiddenCell
+                    x={x}
+                    y={y}
+                    gameOver={gameEndMessage.length}
+                    handleChange={gameEndMessage.length ? null : this.changeCellView}>?
+                  </HiddenCell>
+              ))}
             </tr>)}
           </tbody>
         </table>
