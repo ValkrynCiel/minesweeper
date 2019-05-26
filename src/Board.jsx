@@ -8,7 +8,7 @@ class Board extends Component {
   static defaultProps = {
     height: 10,
     width: 10,
-    mineCount: 5
+    mineCount: 15
   }
 
   constructor(props) {
@@ -31,6 +31,7 @@ class Board extends Component {
     //create board with numeric values
     const valueMap = Array.from(new Array(height),
       () => new Array(width).fill(0));
+
     //fill board with mines and increment values as necessary
     const board = this.createBoard(valueMap,
       this.defineMineLocations(height, width));
@@ -45,13 +46,16 @@ class Board extends Component {
   componentDidUpdate() {
     const { height, width, mineCount } = this.props;
     const { gameEndMessage, safeCount } = this.state;
+
     //check if all safe cells have been revealed and end the game as a win
     if (safeCount === height * width - mineCount && !gameEndMessage) {
+
       this.setState(st => {
         //add flags to mine positions
         for (let [x, y] of this.mines) {
           st.flaggedCells.add(`${x},${y}`);
         }
+
         return { flaggedCells: st.flaggedCells, gameEndMessage: 'YOU WON' }
       })
     }
@@ -216,11 +220,17 @@ class Board extends Component {
             {board.map((r, x) => <tr key={x}>
               {r.map((c, y) => (
                 boardView[x][y] ?
-                  <RevealedCell value={c} key={`${x},${y}`} correct /> :
+                  <RevealedCell 
+                    value={c} 
+                    key={`${x},${y}`} 
+                    wrongFlag={gameEndMessage && 
+                               flaggedCells.has(`${x},${y}`) && 
+                               isFinite(c) ? true : false} /> 
+                    :
                   this.displayHiddenCell({
                     x,
                     y,
-                    gameEnd: gameEndMessage.length,
+                    gameEnd: gameEndMessage,
                     flag: flaggedCells.has(`${x},${y}`),
                     flagMode,
                     handleCellChange: this.handleCellChange

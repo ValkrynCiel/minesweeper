@@ -13,18 +13,12 @@ const CellDisplay = styled(CellWrapper)`
     box-sizing: border-box;
     border: 5px outset silver;
     display: flex;
-    p {
+    img {
       margin: auto;
       height: 80%;
       width: 80%;
     }
-    img {
-      margin: auto;
-      height: 60%;
-      width: 60%;
-    }
   }
-  
 `
 
 class HiddenCell extends PureComponent {
@@ -47,7 +41,7 @@ class HiddenCell extends PureComponent {
       <CellDisplay 
         onClick={disabled ? null : this.handleClick}>
         <div>
-        {flag ? <img src={flagSrc} alt='flag'/> : <p>?</p>}
+        {flag ? <img src={flagSrc} alt='flag'/> : null}
         </div>
       </CellDisplay>
     )
