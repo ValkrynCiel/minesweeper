@@ -7,7 +7,7 @@ class Board extends Component {
   static defaultProps = {
     height: 10,
     width: 10,
-    mineCount: 10
+    mineCount: 5
   }
 
   constructor(props) {
@@ -16,9 +16,12 @@ class Board extends Component {
       board: [],
       boardView: [],
       gameEndMessage: '',
-      safeCount: 0
+      safeCount: 0,
+      flaggedCells: new Set()
     }
-    this.changeCellView = this.changeCellView.bind(this);
+    this.mines = [];
+    this.revealHiddenCell = this.revealHiddenCell.bind(this);
+    this.toggleFlagOnHiddenCell = this.toggleFlagOnHiddenCell.bind(this);
   }
 
   componentDidMount() {
@@ -40,7 +43,12 @@ class Board extends Component {
     const { height, width, mineCount } = this.props;
     const { gameEndMessage, safeCount } = this.state;
     if (safeCount === height * width - mineCount && !gameEndMessage) {
-      this.setState({ gameEndMessage: 'YOU WON' })
+      this.setState(st => {
+        for (let [x, y] of this.mines) {
+          st.flaggedCells.add(`${x},${y}`);
+        }
+        return { flaggedCells: st.flaggedCells, gameEndMessage: 'YOU WON'}
+      })
     }
   }
 
@@ -58,10 +66,13 @@ class Board extends Component {
       //choose random locations from locations array
       let i = Math.floor(Math.random() * locations.length);
       if (i === locations.length - 1) {
-        return locations.pop();
+        let location = locations.pop();
+        this.mines.push(location);
+        return location;
       } else {
         let temp = locations[i];
         locations[i] = locations.pop();
+        this.mines.push(temp);
         return temp;
       }
     }
@@ -88,7 +99,7 @@ class Board extends Component {
     return valueMap;
   }
 
-  changeCellView(x, y) {
+  revealHiddenCell(x, y) {
     this.setState(st => {
       let { boardView, safeCount } = this.searchArea(x, y, st.board, st.boardView, st.safeCount);
       return { boardView, safeCount }
@@ -126,8 +137,24 @@ class Board extends Component {
     return { boardView, safeCount };
   }
 
+  //flag/unflag cells that are potentially mines
+  toggleFlagOnHiddenCell(x, y) {
+    let coord = `${x},${y}`
+    if (this.state.flaggedCells.has(coord)) {
+      this.setState(st => {
+        st.flaggedCells.delete(coord);
+        return { flaggedCells: st.flaggedCells }
+      })
+    } else {
+      this.setState(st => {
+        st.flaggedCells.add(coord);
+        return { flaggedCells: st.flaggedCells }
+      });
+    }
+  }
+
   render() {
-    let { board, boardView, gameEndMessage } = this.state;
+    let { board, boardView, gameEndMessage, flaggedCells } = this.state;
     return (
       <>
         <h1>{gameEndMessage}</h1>
@@ -136,13 +163,14 @@ class Board extends Component {
             {board.map((r, x) => <tr key={x}>
               {r.map((c, y) => (
                 boardView[x][y] ?
-                  <RevealedCell value={c} /> :
+                  <RevealedCell value={c} key={`${x},${y}`}/> :
                   <HiddenCell
+                    key={`${x},${y}`}
                     x={x}
                     y={y}
                     gameOver={gameEndMessage.length}
-                    handleChange={gameEndMessage.length ? null : this.changeCellView}>?
-                  </HiddenCell>
+                    handleCellCheck={gameEndMessage.length ? null : this.revealHiddenCell}
+                    flag={flaggedCells.has(`${x},${y}`)}/>
               ))}
             </tr>)}
           </tbody>
