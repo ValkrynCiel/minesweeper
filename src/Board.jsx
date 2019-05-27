@@ -19,7 +19,8 @@ class Board extends Component {
       gameEndMessage: '',
       safeCount: 0,
       flaggedCells: new Set(),
-      flagMode: false
+      flagMode: false,
+      firstMove: true
     }
     this.mines = [];
     this.handleCellChange = this.handleCellChange.bind(this);
@@ -29,12 +30,8 @@ class Board extends Component {
     const { height, width } = this.props;
 
     //create board with numeric values
-    const valueMap = Array.from(new Array(height),
+    const board = Array.from(new Array(height),
       () => new Array(width).fill(0));
-
-    //fill board with mines and increment values as necessary
-    const board = this.createBoard(valueMap,
-      this.defineMineLocations(height, width));
 
     //create board to determine if a cell is hidden or revealed
     const boardView = Array.from(new Array(height),
@@ -62,13 +59,16 @@ class Board extends Component {
   }
 
   //pick mine coordinates randomly and returns the coordinates of mines
-  defineMineLocations(height, width) {
+  defineMineLocations(height, width, exclude) {
+    const [x, y] = exclude;
     const locations = [];
 
     //create array of coordinate strings
     for (let i = 0; i < height; i++) {
       for (let j = 0; j < width; j++) {
+        if (!(x === i && y === j)) {
         locations.push([i, j]);
+        }
       }
     }
     return () => {
@@ -88,38 +88,49 @@ class Board extends Component {
   }
 
   //create a board populated with numbers around mines
-  createBoard(valueMap, mineGenerator) {
+  placeMines(board, mineGenerator) {
     let mines = 0;
     while (mines < this.props.mineCount) {
       //generate mines until correct number of mines are on the board
       let [x, y] = mineGenerator();
 
-      valueMap[x][y] = 'mine';
+      board[x][y] = 'mine';
 
       for (let i = x - 1; i <= x + 1; i++) {
         for (let j = y - 1; j <= y + 1; j++) {
-          if (valueMap[i] && isFinite(valueMap[i][j])) {
-            valueMap[i][j]++;
+          if (board[i] && isFinite(board[i][j])) {
+            board[i][j]++;
           }
         }
       }
       mines++;
     }
-    return valueMap;
+    return board;
   }
 
   //reveal cells and remove flags as we go along, reveals numbered cells and gaps
   revealHiddenCell(x, y) {
+    
+    if (this.state.firstMove) {
+      const { board } = this.state;
+      const { height, width } = this.props;
+
+      //fill board with mines and increment values as necessary
+      const mineGenerator = this.defineMineLocations(height, width, [x, y]);
+      const newBoard = this.placeMines(board, mineGenerator);
+      this.setState({ board: newBoard, firstMove: false})
+    }
+
     this.setState(st => {
-      let { boardView,
-        safeCount,
-        flaggedCells } = this.searchArea(
+      let { boardView, safeCount, flaggedCells } = 
+      this.searchArea(
           x,
           y,
           st.board,
           st.boardView,
           st.safeCount,
           st.flaggedCells);
+
       return { boardView, safeCount, flaggedCells }
     });
 
