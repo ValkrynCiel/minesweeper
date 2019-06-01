@@ -22,22 +22,17 @@ const CellDisplay = styled(CellWrapper)`
   }
   div {
     position: absolute;
-    height: 100%;
-    width: 100%;
+    height: 40%;
+    width: 40%;
     top: 0;
     left: 0;
     z-index: 10;
-    font-size: 20px; 
-    color: red;
-    text-align: center;
     display: ${props => props.wrongFlag ? 'block' : 'none'};
   } 
   div > img {
     position: absolute;
-    top: 15px;
-    left: 15px;
-    height: 40%;
-    width: 40%;
+    height: 100%;
+    width: 100%;
   }
 `
 

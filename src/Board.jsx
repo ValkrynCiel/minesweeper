@@ -1,15 +1,10 @@
 import React, { Component } from 'react';
 import HiddenCell from './Cell_Hidden';
 import RevealedCell from './Cell_Revealed';
-import flagSrc from './flag.png'
+import Button from './Button';
+import flagSrc from './flag.png';
 
 class Board extends Component {
-
-  static defaultProps = {
-    height: 10,
-    width: 10,
-    mineCount: 15
-  }
 
   constructor(props) {
     super(props);
@@ -58,7 +53,7 @@ class Board extends Component {
     }
   }
 
-  //pick mine coordinates randomly and returns the coordinates of mines
+  /** pick mine coordinates randomly and returns the coordinates of mines */
   defineMineLocations(height, width, exclude) {
     const [x, y] = exclude;
     const locations = [];
@@ -87,7 +82,7 @@ class Board extends Component {
     }
   }
 
-  //create a board populated with numbers around mines
+  /** create a board populated with numbers around mines */
   placeMines(board, mineGenerator) {
     let mines = 0;
     while (mines < this.props.mineCount) {
@@ -108,7 +103,7 @@ class Board extends Component {
     return board;
   }
 
-  //reveal cells and remove flags as we go along, reveals numbered cells and gaps
+  /** reveal cells and remove flags as we go along, reveals numbered cells and gaps */
   revealHiddenCell(x, y) {
     
     if (this.state.firstMove) {
@@ -139,7 +134,7 @@ class Board extends Component {
     }
   }
 
-  //recursively search area for adjacent numbers to reveal
+  /** recursively search area for adjacent numbers to reveal*/
   searchArea(x, y, board, boardView, safeCount, flaggedCells) {
 
     function _revealSpot(x, y) {
@@ -167,7 +162,7 @@ class Board extends Component {
     return { boardView, safeCount, flaggedCells };
   }
 
-  // flag/unflag cells that are potentially mines
+  /** flag/unflag cells that are potentially mines */
   toggleFlagOnHiddenCell(x, y) {
     let coord = `${x},${y}`
     if (this.state.flaggedCells.has(coord)) {
@@ -183,7 +178,7 @@ class Board extends Component {
     }
   }
 
-  //either reveals a hidden cell or toggles the flag indicator depending on mode
+  /** either reveals a hidden cell or toggles the flag indicator depending on mode */
   handleCellChange(x, y) {
     if (this.state.flagMode) {
       this.toggleFlagOnHiddenCell(x, y);
@@ -192,16 +187,17 @@ class Board extends Component {
     }
   }
 
-  changeMode(type) {
-    if (type === 'flag') {
-      this.setState({ flagMode: true });
-    } else {
-      this.setState({ flagMode: false })
-    }
+  changeToFlagMode(bool) {
+    this.setState({ flagMode: bool });
   }
 
-  //hidden cells have robust functionality and must be disabled 
-  displayHiddenCell({ x, y, gameEnd, flag, flagMode, handleCellChange }) {
+  /** hidden cells have robust functionality 
+   * and must be disabled under certain conditions */ 
+  displayHiddenCell(x, y) {
+    const { gameEndMessage, flaggedCells, flagMode } = this.state;
+    const flag = flaggedCells.has(`${x},${y}`);
+    const gameEnd = gameEndMessage.length;
+
     //user cannot reveal a flagged cell or click on a cell at end of game
     if (gameEnd || (flag && flagMode === false)) {
       return (<HiddenCell
@@ -216,7 +212,7 @@ class Board extends Component {
         key={`${x},${y}`}
         x={x}
         y={y}
-        handleCellChange = {handleCellChange}
+        handleCellChange = {this.handleCellChange}
         flag={flag} />)
     }
   }
@@ -230,28 +226,32 @@ class Board extends Component {
           <tbody>
             {board.map((r, x) => <tr key={x}>
               {r.map((c, y) => (
-                boardView[x][y] ?
+                boardView[x][y] 
+                ?
                   <RevealedCell 
                     value={c} 
                     key={`${x},${y}`} 
                     wrongFlag={gameEndMessage && 
                                flaggedCells.has(`${x},${y}`) && 
                                isFinite(c) ? true : false} /> 
-                    :
-                  this.displayHiddenCell({
-                    x,
-                    y,
-                    gameEnd: gameEndMessage,
-                    flag: flaggedCells.has(`${x},${y}`),
-                    flagMode,
-                    handleCellChange: this.handleCellChange
-                  })
+                :
+                  this.displayHiddenCell(x, y)
               ))}
             </tr>)}
           </tbody>
         </table>
-        <button onClick={() => this.changeMode('flag')}><img src={flagSrc} alt='flag mode' /></button>
-        <button onClick={() => this.changeMode('search')}>Search Mode</button>
+
+        <Button onClick={() => this.changeToFlagMode(true)} 
+                imgSrc={flagSrc} 
+                alt='flag'
+                active={flagMode}>
+          Flag Mode
+        </Button>
+        <Button 
+          onClick={() => this.changeToFlagMode(false)}
+          active={!flagMode}>
+            Search Mode
+        </Button>
       </>
     )
   }
