@@ -9,15 +9,17 @@ import targetSrc from './target.png';
 const GameEndMessage = styled.h1`
   font-size: 60px;
   margin: auto;
-  color: red;
+  color: ${props => props.win ? 'lightgreen' : 'red'};
 `
 const ButtonContainer = styled.div`
   height: 100px;
-  width: 500px;
+  width: 60%;
+  min-width: 500px;
   display: flex;
 `
 const BoardWrapper = styled.div`
-  width: 50vw;
+  width: 60vw;
+  min-width: 750px;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -35,7 +37,8 @@ class Board extends Component {
     this.state = {
       board: [],
       boardView: [],
-      gameEndMessage: '',
+      win: false,
+      lose: false,
       safeCount: 0,
       flaggedCells: new Set(),
       flagMode: false,
@@ -61,10 +64,10 @@ class Board extends Component {
 
   componentDidUpdate() {
     const { height, width, mineCount } = this.props;
-    const { gameEndMessage, safeCount } = this.state;
+    const { lose, win, safeCount } = this.state;
 
     //check if all safe cells have been revealed and end the game as a win
-    if (safeCount === height * width - mineCount && !gameEndMessage) {
+    if (safeCount === height * width - mineCount && !win) {
 
       this.setState(st => {
         //add flags to mine positions
@@ -72,7 +75,7 @@ class Board extends Component {
           st.flaggedCells.add(`${x},${y}`);
         }
 
-        return { flaggedCells: st.flaggedCells, gameEndMessage: 'YOU WON' }
+        return { flaggedCells: st.flaggedCells, win: true }
       })
     }
   }
@@ -154,7 +157,7 @@ class Board extends Component {
     });
 
     if (this.state.board[x][y] === 'mine') {
-      this.setState({ gameEndMessage: 'YOU LOST' })
+      this.setState({ lose: true })
     }
   }
 
@@ -188,13 +191,16 @@ class Board extends Component {
 
   /** flag/unflag cells that are potentially mines */
   toggleFlagOnHiddenCell(x, y) {
-    let coord = `${x},${y}`
-    if (this.state.flaggedCells.has(coord)) {
+    const coord = `${x},${y}`;
+    const { flaggedCells } = this.state;
+    const { mineCount } = this.props;
+
+    if (flaggedCells.has(coord)) {
       this.setState(st => {
         st.flaggedCells.delete(coord);
         return { flaggedCells: st.flaggedCells }
       })
-    } else {
+    } else if (!flaggedCells.has(coord) && mineCount - flaggedCells.size !== 0){
       this.setState(st => {
         st.flaggedCells.add(coord);
         return { flaggedCells: st.flaggedCells }
@@ -218,12 +224,11 @@ class Board extends Component {
   /** hidden cells have robust functionality 
    * and must be disabled under certain conditions */ 
   displayHiddenCell(x, y) {
-    const { gameEndMessage, flaggedCells, flagMode } = this.state;
+    const { win, lose, flaggedCells, flagMode } = this.state;
     const flag = flaggedCells.has(`${x},${y}`);
-    const gameEnd = gameEndMessage.length;
 
     //user cannot reveal a flagged cell or click on a cell at end of game
-    if (gameEnd || (flag && flagMode === false)) {
+    if (win || lose || (flag && flagMode === false)) {
       return (<HiddenCell
         key={`${x},${y}`}
         x={x}
@@ -242,24 +247,27 @@ class Board extends Component {
   }
 
   render() {
-    let { board, boardView, gameEndMessage, flaggedCells, flagMode } = this.state;
+    let { board, boardView, win, lose, flaggedCells, flagMode } = this.state;
     return (
       <BoardWrapper>
         <ButtonContainer>
-          { gameEndMessage ? <GameEndMessage>{gameEndMessage}</GameEndMessage> :
+          { win || lose ? 
+          <GameEndMessage win={win}>
+            { win ? 'YOU WIN' : 'YOU LOSE' }
+          </GameEndMessage> :
           <>
             <Button 
               onClick={() => this.changeToFlagMode(false)}
               imgSrc={targetSrc} 
               alt='search'
               active={!flagMode}>
-                Search Mode
+                Search
             </Button>
             <Button onClick={() => this.changeToFlagMode(true)} 
                     imgSrc={flagSrc} 
                     alt='flag'
                     active={flagMode}>
-              Flag Mode
+              Flags Left: {this.props.mineCount - flaggedCells.size}
             </Button>
           </>
           }
@@ -273,7 +281,7 @@ class Board extends Component {
                   <RevealedCell 
                     value={c} 
                     key={`${x},${y}`} 
-                    wrongFlag={gameEndMessage && 
+                    wrongFlag={lose && 
                                flaggedCells.has(`${x},${y}`) && 
                                isFinite(c) ? true : false} /> 
                 :

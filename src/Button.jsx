@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 
 
-const ButtonWrapper = styled.div`
+const ButtonWrapper = styled.button`
   height: 40px;
   width: 200px;
   margin: auto;
@@ -11,6 +11,10 @@ const ButtonWrapper = styled.div`
   border: 5px ${props => props.active ? 'inset': 'outset'} grey;
   display: flex;
   cursor: pointer;
+
+  &:focus {
+    outline: 0px;
+  }
 `
 
 const ButtonDisplay = styled.div`
@@ -38,6 +42,7 @@ class Button extends PureComponent {
   }
 
   handleClick(evt) {
+    evt.preventDefault();
     this.props.onClick();
   }
 

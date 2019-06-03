@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
+import styled from 'styled-components';
 import Board from './Board';
 import NewGameForm from './NewGameForm';
+
+const GameWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`
 
 class Game extends Component {
 
@@ -30,7 +36,7 @@ class Game extends Component {
   render() {
     const { width, height, mineCount, gameId } = this.state;
     return (
-      <>
+      <GameWrapper>
       <Board 
         key={gameId} 
         width={width} 
@@ -42,7 +48,7 @@ class Game extends Component {
         height={height} 
         mineCount={mineCount} 
         makeNewBoard={this.makeNewBoard} />
-      </>
+      </GameWrapper>
     )
   }
 }
