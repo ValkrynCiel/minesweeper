@@ -4,7 +4,6 @@ export const CellWrapper = styled.td`
   height: 40px;
   width: 40px; 
   border: 1px solid white;
-  display: block;
   vertical-align: middle;
   text-align: center;
   font-family: 'VT323', monospace;
