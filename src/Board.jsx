@@ -1,8 +1,31 @@
 import React, { Component } from 'react';
+import styled from 'styled-components';
 import HiddenCell from './Cell_Hidden';
 import RevealedCell from './Cell_Revealed';
 import Button from './Button';
 import flagSrc from './flag.png';
+
+const GameEndMessage = styled.h1`
+  font-size: 60px;
+  margin: auto;
+  color: red;
+`
+const ButtonContainer = styled.div`
+  height: 100px;
+  width: 500px;
+  display: flex;
+`
+const BoardWrapper = styled.div`
+  width: 50vw;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  user-select: none;
+`
+
+const BoardDisplay = styled.table`
+  margin-bottom: 40px;
+`
 
 class Board extends Component {
 
@@ -220,9 +243,25 @@ class Board extends Component {
   render() {
     let { board, boardView, gameEndMessage, flaggedCells, flagMode } = this.state;
     return (
-      <>
-        <h1>{gameEndMessage}</h1>
-        <table>
+      <BoardWrapper>
+        <ButtonContainer>
+          { gameEndMessage ? <GameEndMessage>{gameEndMessage}</GameEndMessage> :
+          <>
+            <Button 
+              onClick={() => this.changeToFlagMode(false)}
+              active={!flagMode}>
+                Search Mode
+            </Button>
+            <Button onClick={() => this.changeToFlagMode(true)} 
+                    imgSrc={flagSrc} 
+                    alt='flag'
+                    active={flagMode}>
+              Flag Mode
+            </Button>
+          </>
+          }
+        </ButtonContainer>
+        <BoardDisplay>
           <tbody>
             {board.map((r, x) => <tr key={x}>
               {r.map((c, y) => (
@@ -239,20 +278,8 @@ class Board extends Component {
               ))}
             </tr>)}
           </tbody>
-        </table>
-
-        <Button onClick={() => this.changeToFlagMode(true)} 
-                imgSrc={flagSrc} 
-                alt='flag'
-                active={flagMode}>
-          Flag Mode
-        </Button>
-        <Button 
-          onClick={() => this.changeToFlagMode(false)}
-          active={!flagMode}>
-            Search Mode
-        </Button>
-      </>
+        </BoardDisplay>
+      </BoardWrapper>
     )
   }
 }
