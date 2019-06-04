@@ -16,6 +16,7 @@ const Input = styled.input`
   background-color: blue;
   margin-left: 10px;
   color: lightgreen;
+  width: 65px;
 `
 
 const FormWrapper = styled.form`
@@ -38,11 +39,19 @@ class NewGameForm extends Component {
   handleSubmit(evt) {
     evt.preventDefault();
     const { height, width, mineCount } = this.state;
-    this.props.makeNewBoard({
-      height, 
-      width, 
-      mineCount
-    });
+    if (!height || !width || !mineCount) {
+      this.setState({
+        height: height || 3,
+        width: width || 3,
+        mineCount: mineCount || 1
+      })
+    } else {
+      this.props.makeNewBoard({
+        height: Math.max(height, 3),
+        width: Math.max(width, 3),
+        mineCount: Math.max(mineCount, 1)
+      });
+    }
   }
 
   handleChange(evt) {
@@ -52,42 +61,42 @@ class NewGameForm extends Component {
   render() {
     const { height, width } = this.state;
     return (
-        <FormWrapper onSubmit={this.handleSubmit}>
-          <InputWrapper>
-            <InputDiv>
-              <label htmlFor="height">Height:</label>
-              <Input id="height" name="height"
-                    value={this.state.height}
-                    type="number"
-                    min="5"
-                    max="15"
-                    step="1"
-                    onChange={this.handleChange} />
-            </InputDiv>
-            <InputDiv>
-              <label htmlFor="width">Width:</label>
-              <Input id="width" name="width"
-                    value={this.state.width}
-                    type="number"
-                    min="5"
-                    max="15"
-                    step="1"
-                    onChange={this.handleChange} />
-            </InputDiv>
-            <InputDiv>         
-              <label htmlFor="mineCount">Number of mines:</label>
-              <Input id="mineCount" name="mineCount"
-                    value={this.state.mineCount}
-                    type="number"
-                    min="1"
-                    max={`${+height * +width - 2}`}
-                    step="1"
-                    onChange={this.handleChange} />
-            </InputDiv> 
-          </InputWrapper>
-          <Button>Make a new board!</Button>
+      <FormWrapper onSubmit={this.handleSubmit}>
+        <InputWrapper>
+          <InputDiv>
+            <label htmlFor="height">Height:</label>
+            <Input id="height" name="height"
+              value={this.state.height}
+              type="number"
+              min="3"
+              max="15"
+              step="1"
+              onChange={this.handleChange} />
+          </InputDiv>
+          <InputDiv>
+            <label htmlFor="width">Width:</label>
+            <Input id="width" name="width"
+              value={this.state.width}
+              type="number"
+              min="3"
+              max="15"
+              step="1"
+              onChange={this.handleChange} />
+          </InputDiv>
+          <InputDiv>
+            <label htmlFor="mineCount">Number of mines:</label>
+            <Input id="mineCount" name="mineCount"
+              value={this.state.mineCount}
+              type="number"
+              min="1"
+              max={`${+height * +width - 1}`}
+              step="1"
+              onChange={this.handleChange} />
+          </InputDiv>
+        </InputWrapper>
+        <Button>Make a new board!</Button>
 
-        </FormWrapper>
+      </FormWrapper>
     );
   }
 }
