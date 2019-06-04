@@ -8,8 +8,8 @@ const CellDisplay = styled(CellWrapper)`
   background-color: grey;
   cursor: ${props => props.onClick ? 'pointer' : 'default'}
   div {
-    height: 40px;
-    width: 40px;
+    height: 39px;
+    width: 39px;
     border: 5px outset silver;
     display: flex;
     img {
