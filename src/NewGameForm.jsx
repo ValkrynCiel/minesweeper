@@ -38,7 +38,11 @@ class NewGameForm extends Component {
   handleSubmit(evt) {
     evt.preventDefault();
     const { height, width, mineCount } = this.state;
-    this.props.makeNewBoard({height, width, mineCount});
+    this.props.makeNewBoard({
+      height, 
+      width, 
+      mineCount
+    });
   }
 
   handleChange(evt) {
@@ -57,6 +61,7 @@ class NewGameForm extends Component {
                     type="number"
                     min="5"
                     max="15"
+                    step="1"
                     onChange={this.handleChange} />
             </InputDiv>
             <InputDiv>
@@ -66,6 +71,7 @@ class NewGameForm extends Component {
                     type="number"
                     min="5"
                     max="15"
+                    step="1"
                     onChange={this.handleChange} />
             </InputDiv>
             <InputDiv>         
@@ -75,6 +81,7 @@ class NewGameForm extends Component {
                     type="number"
                     min="1"
                     max={`${+height * +width - 2}`}
+                    step="1"
                     onChange={this.handleChange} />
             </InputDiv> 
           </InputWrapper>
