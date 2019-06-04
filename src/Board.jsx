@@ -65,7 +65,7 @@ class Board extends Component {
 
   componentDidUpdate() {
     const { height, width, mineCount } = this.props;
-    const { lose, win, safeCount } = this.state;
+    const { win, safeCount } = this.state;
 
     //check if all safe cells have been revealed and end the game as a win
     if (safeCount === height * width - mineCount && !win) {
