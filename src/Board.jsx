@@ -9,6 +9,7 @@ import targetSrc from './target.png';
 const GameEndMessage = styled.h1`
   font-size: 60px;
   margin: auto;
+  display: block;
   color: ${props => props.win ? 'lightgreen' : 'red'};
 `
 const ButtonContainer = styled.div`
