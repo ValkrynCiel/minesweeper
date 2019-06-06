@@ -1,6 +1,7 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 # Minesweeper
+![image of Minesweeper](./minesweeper.png)
 **Classic game built with React and styled-components.** <br>
 * Players click on cells and avoid mines by revealing numbers that reveal the number of mines in the immediate vicinity. 
 * Flags can be used to mark uncovered mines
