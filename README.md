@@ -23,3 +23,8 @@ cd minesweeper
 npm start
 ```
 
+### TODO
+* Add a timer that stops when the game ends
+* Add right-click functionality for marking guesses with a '?'
+* Add animation for making a new board, potentially with mines 'falling into' board
+
