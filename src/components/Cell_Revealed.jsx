@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import { CellWrapper } from './CellWrapper';
-import mineSrc from './mine.png';
-import flagSrc from './flag.png';
+import mineSrc from '../images/mine.png';
+import flagSrc from '../images/flag.png';
 
 const CellDisplay = styled(CellWrapper)`
   background-color: ${props => props.value === 'explosion' ? 'red' : 'gainsboro'};

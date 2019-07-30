@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import HiddenCell from './Cell_Hidden';
 import RevealedCell from './Cell_Revealed';
 import Button from './Button';
-import flagSrc from './flag.png';
-import targetSrc from './target.png';
+import flagSrc from '../images/flag.png';
+import targetSrc from '../images/target.png';
 
 const GameEndMessage = styled.h1`
   font-size: 60px;

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import { CellWrapper } from './CellWrapper';
-import flagSrc from './flag.png'
+import flagSrc from '../images/flag.png'
 
 
 const CellDisplay = styled(CellWrapper)`
